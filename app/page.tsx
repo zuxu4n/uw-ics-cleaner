@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 
 type Category =
     | "fees"
@@ -80,6 +81,9 @@ async function copyToClipboard(text: string) {
 export default function Home() {
     const [availableTerms, setAvailableTerms] = useState<string[]>([]);
     const [selectedTerms, setSelectedTerms] = useState<Set<string>>(new Set());
+    const [showGoogle, setShowGoogle] = useState(false);
+    const [showOutlook, setShowOutlook] = useState(false);
+    const [showText, setShowText] = useState(false);
     const [cats, setCats] = useState<Record<Category, boolean>>({
         fees: true,
         exams: true,
@@ -124,7 +128,7 @@ export default function Home() {
     function showToast(msg: string) {
         setToast(msg);
         if (toastTimer.current) window.clearTimeout(toastTimer.current);
-        toastTimer.current = window.setTimeout(() => setToast(null), 2500);
+        toastTimer.current = window.setTimeout(() => setToast(null), 6000);
     }
 
     function buildApiUrl(withFormat: "json" | "ics" | "ics_sub") {
@@ -297,7 +301,7 @@ export default function Home() {
                             </label>
                         ))}
                     </div>
-                    <div style={{ marginTop: 12, opacity: 0.75 }}>
+                    <div style={{ marginTop: 12, opacity: 0.9 }}>
                         <div style={{ fontWeight: 700, marginBottom: 6 }}>
                             Informational (optional)
                         </div>
@@ -424,7 +428,7 @@ export default function Home() {
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                         <button
-                            style={{ padding: "8px 10px", textAlign: "left" }}
+                            style={{ padding: "8px 10px", textAlign: "left" , cursor: "pointer" }}
                             onClick={async () => {
                                 const url = getPublicSubscribeUrl();
                                 const copied = await copyToClipboard(url);
@@ -437,39 +441,61 @@ export default function Home() {
                             Apple Calendar
                         </button>
                         <button
-                            style={{ padding: "8px 10px", textAlign: "left" }}
+                            style={{ padding: "8px 10px", textAlign: "left" , cursor: "pointer" }}
                             onClick={async () => {
                                 const url = getPublicSubscribeUrl();
                                 const copied = await copyToClipboard(url);
                                 if (copied)
-                                    showToast("Link copied. Paste it into Google Calendar.");
+                                    showToast("Link copied. Click below to open Google Calendar.");
                                 else
                                     showToast("Copy the URL and paste it into Google Calendar.");
-                                window.open(
-                                    "https://calendar.google.com/calendar/u/0/r/settings/addbyurl",
-                                    "_blank"
-                                );
+                                setShowGoogle(true);
                             }}
                         >
                             Google Calendar
                         </button>
+                        {showGoogle && (
+                            <button
+                                style={{ padding: "8px 10px", marginLeft: 12 , cursor: "pointer" }}
+                                onClick={() =>
+                                    window.open(
+                                        "https://calendar.google.com/calendar/u/0/r/settings/addbyurl",
+                                        "_blank"
+                                    )
+                                }
+                            >
+                                Open Google “Add by URL”
+                            </button>
+                        )}
                         <button
-                            style={{ padding: "8px 10px", textAlign: "left" }}
+                            style={{ padding: "8px 10px", textAlign: "left" , cursor: "pointer" }}
                             onClick={async () => {
                                 const url = getPublicSubscribeUrl();
                                 const copied = await copyToClipboard(url);
-                                if (copied) showToast("Link copied. Paste it into Outlook.");
-                                else showToast("Copy the URL and paste it into Outlook.");
-                                window.open(
-                                    "https://outlook.office.com/calendar/0/addcalendar",
-                                    "_blank"
-                                );
+                                if (copied)
+                                    showToast("Link copied. Click below to open Outlook.");
+                                else
+                                    showToast("Copy the URL and paste it into Outlook.");
+                                setShowOutlook(true);
                             }}
                         >
                             Microsoft Outlook
                         </button>
+                        {showOutlook && (
+                            <button
+                                style={{ padding: "8px 10px", marginLeft: 12 , cursor: "pointer" }}
+                                onClick={() =>
+                                    window.open(
+                                        "https://outlook.office.com/calendar/0/addcalendar",
+                                        "_blank"
+                                    )
+                                }
+                            >
+                                Open Outlook “Add Calendar”
+                            </button>
+                        )}
                         <button
-                            style={{ padding: "8px 10px", textAlign: "left" }}
+                            style={{ padding: "8px 10px", textAlign: "left" , cursor: "pointer" }}
                             onClick={() => {
                                 window.location.href = buildApiUrl("ics");
                             }}
@@ -487,6 +513,36 @@ export default function Home() {
                     >
                         Subscriptions update automatically, but Google/Outlook usually
                         require you to paste the URL once.
+                    </div>
+
+                    <div style={{ position: "relative", display: "inline-block", marginTop: 300 }}>
+                        {showText && (
+                            <div
+                                style={{
+                                    position: "absolute",
+                                    bottom: "100%",
+                                    left: "50%",
+                                    transform: "translateX(-50%)",
+                                    marginBottom: 8,
+                                    background: "#111",
+                                    color: "#fff",
+                                    padding: "6px 10px",
+                                    borderRadius: 6
+                                }}
+                            >
+                                QUACK!?!?!?!?
+                            </div>
+                        )}
+
+                        <Image
+                            src="/dagoose.jpg"
+                            alt="dagoose"
+                            width={200}
+                            height={200}
+                            style={{ cursor: "pointer" }}
+                            title="do not anger it..."
+                            onClick={() => setShowText(prev => !prev)}
+                        />
                     </div>
                 </aside>
             </div>
